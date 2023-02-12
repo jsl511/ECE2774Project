@@ -7,37 +7,42 @@ from Geometry import Geometry
 
 
 class TransmissionLine:
-    def __init__(self, name, length, bus1Connection, bus2Connection):
+    def __init__(self, name, length, bus1Connection, bus2Connection, spacing, numberConductors,x_a, x_b, x_c, y_a, y_b, y_c, diameter, GMR, resistance, ampacity,v):
         self.name = name
         self.length = length
-        self.bus1Connection = Bus(bus1Connection)
-        self.bus2Connection = Bus(bus2Connection)
+        self.v=v
+        self.bus1Connection = bus1Connection
+        self.bus2Connection = bus2Connection
+
+        self.buses = [self.bus1Connection, self.bus2Connection]
 
         self.Bundle = None
         self.Geometry = None
         self.Conductor = None
 
-        self.impedance = None
-        self.admittance = None
 
-    def setBundle(self, name, spacing, numberConductors):
-        self.Bundle = Bundle(name, spacing, numberConductors)
+        self.spacing=spacing
+        self.numberConductors=numberConductors
 
-    def setGeometry(self, x_a, x_b, x_c, y_a, y_b, y_c):
-        self.Geometry = Geometry(x_a, x_b, x_c, y_a, y_b, y_c)
+        self.Bundle = Bundle(self.name, self.spacing, self.numberConductors)
+        self.Bundle.setConductor(name, diameter, GMR, resistance, ampacity)
 
-    def solveImpedance(self):
-        self.impedance = (self.Bundle.resistance*self.length) + 1j*377*(self.Bundle.inductance*self.length)
-        self.admittance = 1/self.admittance
 
-    def solveShuntAdmittance(self):
-        self.shuntAdmittance = 1j*377*(self.Bundle.capacitance*self.length)
+        self.x_a=x_a
+        self.x_b=x_b
+        self.x_c=x_c
+        self.y_a=y_a
+        self.y_b=y_b
+        self.y_c=y_c
+        self.Geometry = Geometry(self.x_a, self.x_b, self.x_c, self.y_a, self.y_b, self.y_c)
 
-TX1 = TransmissionLine("line 1",100,"A","B")
-TX1.setBundle("two line",2,2)
-TX1.Bundle.setConductor("conductor",2,2,2,2)
-TX1.Bundle.setGeometry(4,2,6,2,2,2)
-TX1.Bundle.solveCapacitance()
-TX1.Bundle.solveInductance()
-TX1.solveImpedance()
-TX1.solveShuntAdmittance()
+        self.capacitance = (2 * math.pi * 8.854 * 10 ** (-12)) / math.log(self.Geometry.D_eq / self.Bundle.D_SC)
+        self.inductance = (2 * 10 ** (-7)) * math.log(self.Geometry.D_eq / self.Bundle.D_SL)
+
+        self.impedance = (self.Bundle.resistance*self.length) + 1j*377*(self.inductance*self.length)
+        self.admittance = 1/self.impedance #update
+
+
+        self.shuntAdmittance = 1j*377*(self.capacitance*self.length)
+
+

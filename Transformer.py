@@ -10,8 +10,10 @@ class Transformer:
         self.voltageRatingLow = voltageRatingLow
         self.impedance = impedance  # per-unit impedance
         self.xR = xR
-        self.bus1Connection = Bus(bus1Connection)
-        self.bus2Connection = Bus(bus2Connection)
+
+        self.bus1Connection = bus1Connection
+        self.bus2Connection = bus2Connection
+        self.buses =[self.bus1Connection, self.bus2Connection]
 
         self.Impedance = self.impedance*math.e**(1j*math.atan(self.xR))
         self.Admittance = 1/self.Impedance
