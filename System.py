@@ -3,6 +3,8 @@ from typing import Dict, List, Optional
 from Transformer import Transformer
 from TransmissionLine import TransmissionLine
 from Bus import Bus
+from Conductor import Conductor
+from Geometry import Geometry
 
 
 class System:
@@ -16,13 +18,26 @@ class System:
         self.transmissionlines: Dict[str, TransmissionLine] = dict()
         self.transformers: Dict[str, Transformer] = dict()
 
+
+        self.conductor = None
+        self.geometry = None
+
+
     def __add_bus(self, bus):
         if bus not in self.buses.keys():
             self.buses[bus]=Bus(bus)
             self.buses_order.append(bus)
 
-    def add_transmission_line(self,name, length, bus1Connection, bus2Connection, spacing, numberConductors,x_a, x_b, x_c, y_a, y_b, y_c,diameter, GMR, resistance, ampacity,v):
-        self.transmissionlines[name]= TransmissionLine( name, length, bus1Connection, bus2Connection, spacing, numberConductors,x_a, x_b, x_c, y_a, y_b, y_c, diameter, GMR, resistance, ampacity,v)
+    def add_conductor(self,name,diameter, GMR, resistance, ampacity):
+        self.conductor=Conductor(name,diameter,GMR,resistance, ampacity)
+        return self.conductor
+
+    def add_geometry(self,x_a, x_b, x_c, y_a, y_b, y_c):
+        self.geometry=Geometry(x_a, x_b, x_c, y_a, y_b, y_c)
+        return self.geometry
+
+    def add_transmission_line(self,name, length, bus1Connection, bus2Connection, spacing, numberConductors,geometry,conductor,v):
+        self.transmissionlines[name]= TransmissionLine( name, length, bus1Connection, bus2Connection, spacing, numberConductors,geometry, conductor,v)
         self.__add_bus(bus1Connection)
         self.__add_bus(bus2Connection)
 
@@ -35,12 +50,5 @@ class System:
         self.__add_bus(bus1Connection)
         self.__add_bus(bus2Connection)
 
-
-        #TX1.Bundle.setConductor("conductor", 2, 2, 2, 2)
-        ##TX1.Bundle.setGeometry(x_a, x_b, x_c, y_a, y_b, y_c)
-        ##TX1.Bundle.solveCapacitance()
-        ##TX1.Bundle.solveInductance()
-        ##TX1.solveImpedance()
-        ##TX1.solveShuntAdmittance()
 
 
