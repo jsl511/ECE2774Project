@@ -1,43 +1,48 @@
 import math
 
-from Bus import Bus
-from Conductor import Conductor
-from Bundle import Bundle
-from Geometry import Geometry
+from Bundle import bundle
+from Geometry import geometry
 
 
 class TransmissionLine:
-    def __init__(self, name, length, bus1Connection, bus2Connection):
+    def __init__(self, name, length, bus1, bus2, bundle, geometry):
         self.name = name
-        self.length = length
-        self.bus1Connection = Bus(bus1Connection)
-        self.bus2Connection = Bus(bus2Connection)
+        self.length = length    # (mi)
+        self.bus1 = bus1
+        self.bus2 = bus2
 
-        self.Bundle = None
-        self.Geometry = None
-        self.Conductor = None
+        self.bundle = bundle        # Bundle object
+        self.geometry = geometry    # Geometry object
 
-        self.impedance = None
-        self.admittance = None
+        self.inductance = None      # (H/m)
+        self.capacitance = None     # (F/m)
+        self.impedance = None       # series impedance of the line (Ohms)
+        self.admittance = None      # shunt admittance of the line (S)
 
-    def setBundle(self, name, spacing, numberConductors):
-        self.Bundle = Bundle(name, spacing, numberConductors)
+    def calculate_capacitance(self):
+        self.capacitance = (2*math.pi*8.854*10**(-12))/math.log(self.geometry.D_eq/self.bundle.D_SC)
+        self.capacitance = self.capacitance/0.000621371     # convert from (F/m) to (F/mi)
 
-    def setGeometry(self, x_a, x_b, x_c, y_a, y_b, y_c):
-        self.Geometry = Geometry(x_a, x_b, x_c, y_a, y_b, y_c)
+    def calculate_inductance(self):
+        self.inductance = (2*10**(-7))*math.log(self.geometry.D_eq/self.bundle.D_SL)
+        self.inductance = self.inductance/0.000621371       # convert from (H/m) to (H/mi)
 
-    def solveImpedance(self):
-        self.impedance = (self.Bundle.resistance*self.length) + 1j*377*(self.Bundle.inductance*self.length)
-        self.admittance = 1/self.admittance
+    def calculate_impedance(self):
+        self.impedance = (self.bundle.resistance*self.length) + 1j*377*(self.inductance*self.length)
 
-    def solveShuntAdmittance(self):
-        self.shuntAdmittance = 1j*377*(self.Bundle.capacitance*self.length)
+    def calculate_admittance(self):
+        self.admittance = 1j*377*(self.capacitance*self.length)
 
-TX1 = TransmissionLine("line 1",100,"A","B")
-TX1.setBundle("two line",2,2)
-TX1.Bundle.setConductor("conductor",2,2,2,2)
-TX1.Bundle.setGeometry(4,2,6,2,2,2)
-TX1.Bundle.solveCapacitance()
-TX1.Bundle.solveInductance()
-TX1.solveImpedance()
-TX1.solveShuntAdmittance()
+
+bundle.calculate_GMR()
+geometry.calculate_GMD()
+
+TX1 = TransmissionLine("L1", 10, "2", "4", bundle, geometry)
+TX1.calculate_capacitance()
+print(TX1.capacitance)
+TX1.calculate_inductance()
+print(TX1.inductance)
+TX1.calculate_impedance()
+print(TX1.impedance)
+TX1.calculate_admittance()
+print(TX1.admittance)
