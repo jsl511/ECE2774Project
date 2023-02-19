@@ -35,4 +35,3 @@ class Bundle:
 
 
 bundle = Bundle("bundle", 1.5, 2, partridge)
-print(bundle.resistance)

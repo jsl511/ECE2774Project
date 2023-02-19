@@ -28,4 +28,3 @@ class Geometry:
 
 
 geometry = Geometry(0, 19.5, 39, 0, 0, 0)   # all lines at same height, y-coordinates obsolete
-print(geometry.calculate_GMD())
