@@ -1,8 +1,5 @@
 import math
 
-from Bundle import bundle
-from Geometry import geometry
-
 
 class TransmissionLine:
     def __init__(self, name, length, bus1, bus2, bundle, geometry):
@@ -32,17 +29,3 @@ class TransmissionLine:
 
     def calculate_admittance(self):
         self.admittance = 1j*377*(self.capacitance*self.length)
-
-
-bundle.calculate_GMR()
-geometry.calculate_GMD()
-
-TX1 = TransmissionLine("L1", 10, "2", "4", bundle, geometry)
-TX1.calculate_capacitance()
-print(TX1.capacitance)
-TX1.calculate_inductance()
-print(TX1.inductance)
-TX1.calculate_impedance()
-print(TX1.impedance)
-TX1.calculate_admittance()
-print(TX1.admittance)

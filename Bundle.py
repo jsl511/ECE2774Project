@@ -1,7 +1,5 @@
 import math
 
-from Conductor import partridge
-
 
 class Bundle:
     def __init__(self, name, spacing, number_conductors, conductor):
