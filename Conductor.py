@@ -7,7 +7,3 @@ class Conductor:
         self.resistance = resistance    # at 25 C (Ohm/mile)
 
         self.radius = self.diameter / 2
-
-
-# instantiate a partridge conductor
-partridge = Conductor("partridge", 0.642, 0.0217, 460, 0.350)

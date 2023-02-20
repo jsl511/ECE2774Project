@@ -25,6 +25,3 @@ class Geometry:
         self.D_eq = (self.D_ab * self.D_bc * self.D_ca)**(1 / 3)
 
         return self.D_eq
-
-
-geometry = Geometry(0, 19.5, 39, 0, 0, 0)   # all lines at same height, y-coordinates obsolete

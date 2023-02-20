@@ -32,6 +32,3 @@ class Bundle:
         else:
             print("Unexpected number of conductors")
             exit(1)
-
-
-bundle = Bundle("bundle", 1.5, 2, partridge)
