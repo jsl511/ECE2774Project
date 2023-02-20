@@ -11,7 +11,7 @@ class Transformer:
         self.x_r = x_r              # X/R ratio
         self.bus1 = bus1            # high-side bus connection
         self.bus2 = bus2            # low-side bus connection
-
+        
         self.transformer_impedance = None
 
     def calculate_impedance(self):
