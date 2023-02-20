@@ -1,50 +1,32 @@
 import math
 
-from Conductor import Conductor
-from Geometry import Geometry
-
 
 class Bundle:
-    def __init__(self, name, spacing, numberConductors,conductor):
+    def __init__(self, name, spacing, number_conductors, conductor):
         self.name = name
-        self.spacing = spacing
-        self.numberConductors = numberConductors
+        self.spacing = spacing  # distance between subconductors (ft)
+        self.number_conductors = number_conductors  # number of subconductors in the bundle
 
-        self.conductor = conductor
-        self.Geometry = None
+        self.conductor = conductor    # Conductor object
 
-        self.D_SL = None
-        self.D_SC = None
-        self.resistance = None
-        self.capacitance = None
-        self.inductance = None
+        self.resistance = self.conductor.resistance/self.number_conductors   # adjust bundle resistance
 
-        # calculate bundle parameters based on the number of conductors: D_SL, D_SC, resistance per unit length
-        if self.numberConductors == 1:
+        self.D_SL = None    # stranded GMR for inductance
+        self.D_SC = None    # stranded GMR for capacitance
+
+    def calculate_GMR(self):
+        if self.number_conductors == 1:
             self.D_SL = self.conductor.GMR
             self.D_SC = self.conductor.radius
-            self.resistance = self.conductor.resistance
-        elif self.numberConductors == 2:
+        elif self.number_conductors == 2:
             self.D_SL = math.sqrt(self.conductor.GMR * self.spacing)
             self.D_SC = math.sqrt(self.conductor.radius * self.spacing)
-            self.resistance = self.conductor.resistance / 2
-        elif self.numberConductors == 3:
+        elif self.number_conductors == 3:
             self.D_SL = (self.conductor.GMR * (self.spacing ** 2)) ** (1 / 3)
             self.D_SC = (self.conductor.radius * (self.spacing ** 2)) ** (1 / 3)
-            self.resistance = self.conductor.resistance / 3
-        elif self.numberConductors == 4:
+        elif self.number_conductors == 4:
             self.D_SL = 1.0941 * (self.conductor.GMR * (self.spacing ** 3)) ** (1 / 4)
             self.D_SC = 1.0941 * (self.conductor.radius * (self.spacing ** 3)) ** (1 / 4)
-            self.resistance = self.conductor.resistance / 4
         else:
-            print("Invalid number of conductors")
+            print("Unexpected number of conductors")
             exit(1)
-
-    def setGeometry(self, x_a, x_b, x_c, y_a, y_b, y_c):
-        self.Geometry = Geometry(x_a, x_b, x_c, y_a, y_b, y_c)
-
-    def solveCapacitance(self):
-        self.capacitance = (2*math.pi*8.854*10**(-12))/math.log(self.Geometry.D_eq/self.D_SC)
-
-    def solveInductance(self):
-        self.inductance = (2*10**(-7))*math.log(self.Geometry.D_eq/self.D_SL)

@@ -1,13 +1,9 @@
 class Bus:
-    busCount = 0
+    bus_count = 0
 
     def __init__(self, name):
         self.name = name
-        self.index = Bus.busCount
 
-        self.voltage = None
-
-        Bus.busCount = Bus.busCount + 1
-
-    def setVoltage(self, voltage):
-        self.voltage = voltage
+        Bus.bus_count += 1
+        print("There are " + str(Bus.bus_count) + " buses in the system.")
+        
