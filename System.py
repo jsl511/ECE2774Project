@@ -9,10 +9,12 @@ from Transformer import Transformer
 class System:
     def __init__(self):
         # assumes one conductor, geometry, and bundling configuration for the entire system
+        # to accommodate multiples, change to str:Obj dictionaries; methods to add_<element>()
         self.conductor = None
         self.bundle = None
         self.geometry = None
 
+        # empty dictionaries to hold elements with string keys and Object values
         self.buses = {}
         self.lines = {}
         self.transformers = {}
