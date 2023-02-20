@@ -10,5 +10,5 @@ system.set_geometry(0, 19.5, 39, 0, 0, 0)   # all lines at same height, y-coordi
 system.geometry.calculate_GMD()
 
 system.add_transformer("T1", 125, 20, 230, 0.085, 10, "1", "2")
-system.add_transformer("T2", 200, 20, 230)
+system.add_transformer("T2", 200, 20, 230, 0.105, 12, "6", "7")
 system.add_line("L1", 10, "2", "4", system.bundle, system.geometry)
