@@ -26,12 +26,17 @@ class System:
     def add_line(self, name, length, bus1, bus2, bundle, geometry):
         if name not in self.lines.keys():
             self.lines.update({name: TransmissionLine(name, length, bus1, bus2, bundle, geometry)})
+            self.lines.get(name).calculate_capacitance()
+            self.lines.get(name).calculate_inductance()
+            self.lines.get(name).calculate_impedance()
+            self.lines.get(name).calculate_admittance()
             self.__add_bus(bus1)
             self.__add_bus(bus2)
 
     def add_transformer(self, name, power, voltage1, voltage2, impedance, x_r, bus1, bus2):
         if name not in self.transformers.keys():
             self.transformers.update(({name: Transformer(name, power, voltage1, voltage2, impedance, x_r, bus1, bus2)}))
+            self.transformers.get(name).calculate_admittance()
             self.__add_bus(bus1)
             self.__add_bus(bus2)
 

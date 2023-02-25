@@ -1,24 +1,34 @@
-from System import System
 import numpy as np
 
 
 class Ybus:
-    def __init__(self, system: System):
-        self.system = system
+    def __init__(self):
+        self.y_bus = None
 
-    def createYbus(self):
-        self.yBusMatrix=np.zeros((len(self.system.buses),len(self.system.buses)))
+    def calculate_Ybus(self, system):
+        self.y_bus = np.zeros((len(system.buses), len(system.buses)), dtype=complex)
 
+        # transformer admittance
+        for value in system.transformers.values():
+            bus1 = int(value.bus1) - 1
+            bus2 = int(value.bus2) - 1
 
+            self.y_bus[bus1, bus2] += [value.transformer_admittance]
+            self.y_bus[bus1, bus1] += [value.transformer_admittance]
+            self.y_bus[bus2, bus2] += [value.transformer_admittance]
+            self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
+        # transmission line admittance
+        for value in system.lines.values():
+            bus1 = int(value.bus1) - 1
+            bus2 = int(value.bus2) - 1
 
-testSystem=System("test")
+            self.y_bus[bus1, bus2] += [1/value.impedance + value.admittance]
+            self.y_bus[bus1, bus1] += [1/value.impedance + value.admittance/2]
+            self.y_bus[bus2, bus2] += [1/value.impedance + value.admittance/2]
+            self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
-testSystem.add_tranformer("transformer1", 100, 140, 110, 2, 10, "A", "B")
-testSystem.add_transmission_line("line1", 5, "B", "C", 2, 3, 5, 4, 3, 3, 2, 1,3, 3, 2, 1,120)
+        print(self.y_bus)
 
-Ybustest=Ybus(testSystem)
-
-Ybustest.createYbus()
-print("good")
-
+# check connection from bus A to B
+    # if connected, through transmission line or transformer?
