@@ -11,8 +11,8 @@ class Transformer:
         self.x_r = x_r              # X/R ratio
         self.bus1 = bus1            # high-side bus connection
         self.bus2 = bus2            # low-side bus connection
-        
-        self.transformer_impedance = None
 
-    def calculate_impedance(self):
-        self.transformer_impedance = self.impedance*math.e**(1j*math.atan(self.x_r))
+        self.transformer_admittance = None
+
+    def calculate_admittance(self):
+        self.transformer_admittance = 1/self.impedance*math.e**(1j*math.atan(self.x_r))
