@@ -15,4 +15,4 @@ class Transformer:
         self.transformer_admittance = None
 
     def calculate_admittance(self):
-        self.transformer_admittance = 1/self.impedance*math.e**(1j*math.atan(self.x_r))
+        self.transformer_admittance = 1/(self.impedance*math.e**(1j*math.atan(self.x_r)))
