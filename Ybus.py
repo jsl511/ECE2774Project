@@ -13,7 +13,7 @@ class Ybus:
             bus1 = int(value.bus1) - 1
             bus2 = int(value.bus2) - 1
 
-            self.y_bus[bus1, bus2] += [value.transformer_admittance]
+            self.y_bus[bus1, bus2] -= [value.transformer_admittance]
             self.y_bus[bus1, bus1] += [value.transformer_admittance]
             self.y_bus[bus2, bus2] += [value.transformer_admittance]
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
@@ -23,7 +23,7 @@ class Ybus:
             bus1 = int(value.bus1) - 1
             bus2 = int(value.bus2) - 1
 
-            self.y_bus[bus1, bus2] += [1/value.impedance + value.admittance]
+            self.y_bus[bus1, bus2] -= [1/value.impedance + value.admittance]
             self.y_bus[bus1, bus1] += [1/value.impedance + value.admittance/2]
             self.y_bus[bus2, bus2] += [1/value.impedance + value.admittance/2]
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
