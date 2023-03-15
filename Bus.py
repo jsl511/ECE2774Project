@@ -4,10 +4,10 @@ class Bus:
     def __init__(self, name):
         self.name = name
 
-        self.voltage = None
-        self.angle = None
-        self.power = None
-        self.reactive = None
+        self.voltage = 0
+        self.angle = 0
+        self.power = 0
+        self.reactive = 0
 
         Bus.bus_count += 1
 

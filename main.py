@@ -20,5 +20,18 @@ system.add_line("L4", 20, "4", "6", system.bundle, system.geometry)
 system.add_line("L5", 10, "6", "5", system.bundle, system.geometry)
 system.add_line("L6", 35, "4", "5", system.bundle, system.geometry)
 
+
 y_bus = Ybus()
+
 y_bus.calculate_Ybus(system)
+
+
+system.buses.get("2").set_power(0, 0)
+system.buses.get("3").set_power(110, 50)
+system.buses.get("4").set_power(100, 70)
+system.buses.get("5").set_power(100, 65)
+system.buses.get("6").set_power(0, 0)
+system.buses.get("7").set_power(0, 0)
+
+system.solve_jacobian(y_bus)
+system.flat_start()
