@@ -78,22 +78,23 @@ class System:
                 if n != k:
                     j1tot = j1tot + abs(Ybus.y_bus[kint, nint]) * self.buses.get(n).voltage * math.sin(self.buses.get(k).angle - self.buses.get(n).angle - np.angle(Ybus.y_bus[kint, nint]))
                     j3tot = j3tot + abs(Ybus.y_bus[kint, nint]) * self.buses.get(n).voltage * math.cos(self.buses.get(k).angle - self.buses.get(n).angle - np.angle(Ybus.y_bus[kint, nint]))
-
                 j2tot = j2tot + abs(Ybus.y_bus[kint, nint]) * self.buses.get(n).voltage * math.cos(self.buses.get(k).angle - self.buses.get(n).angle - np.angle(Ybus.y_bus[kint, nint]))
                 j4tot = j4tot + abs(Ybus.y_bus[kint, nint]) * self.buses.get(n).voltage * math.sin(self.buses.get(k).angle - self.buses.get(n).angle - np.angle(Ybus.y_bus[kint, nint]))
+
 
         for k in self.buses:
             for n in self.buses:
                 kint = int(k)-1
                 nint = int(n)-1
 
-                if (n != k) & (n != 1) & (k != 1):
+                if n != k:
                     #off-diagonal elements of J
                     self.jacobian1[kint, nint] = self.buses.get(k).voltage * abs(Ybus.y_bus[kint, nint]) * self.buses.get(n).voltage * math.sin(self.buses.get(k).angle-self.buses.get(n).angle-np.angle(Ybus.y_bus[kint, nint]))
                     self.jacobian2[kint, nint] = self.buses.get(k).voltage * abs(Ybus.y_bus[kint, nint]) * math.cos(self.buses.get(k).angle-self.buses.get(n).angle-np.angle(Ybus.y_bus[kint, nint]))
                     self.jacobian3[kint, nint] = -self.buses.get(k).voltage * abs(Ybus.y_bus[kint, nint]) * self.buses.get(n).voltage * math.cos(self.buses.get(k).angle-self.buses.get(n).angle-np.angle(Ybus.y_bus[kint, nint]))
                     self.jacobian4[kint, nint] = self.buses.get(k).voltage * abs(Ybus.y_bus[kint, nint]) * math.sin(self.buses.get(k).angle-self.buses.get(n).angle-np.angle(Ybus.y_bus[kint, nint]))
-                if (n == k) & (n != 1) & (k != 1):
+                if n == k:
+                    #diagonal elements
                     self.jacobian1[kint, nint] = -self.buses.get(k).voltage*j1tot
                     self.jacobian2[kint, nint] = self.buses.get(k).voltage*abs(Ybus.y_bus[kint, nint])*math.cos(np.angle(Ybus.y_bus[kint, nint]))+j2tot
                     self.jacobian3[kint, nint] = self.buses.get(k).voltage*j3tot
@@ -105,7 +106,7 @@ class System:
         jacobian24 = np.concatenate((self.jacobian2, self.jacobian4), axis=0)
         jacobian= np.concatenate((jacobian13, jacobian24), axis=1)
 
-        print(jacobian)
+        print(np.around(jacobian, decimals=1))
 
 
     def flat_start(self):

@@ -33,5 +33,6 @@ system.buses.get("5").set_power(100, 65)
 system.buses.get("6").set_power(0, 0)
 system.buses.get("7").set_power(0, 0)
 
-system.solve_jacobian(y_bus)
 system.flat_start()
+system.solve_jacobian(y_bus)
+
