@@ -18,6 +18,3 @@ class Bus:
     def set_power(self, power, reactive):
         self.power = power
         self.reactive = reactive
-
-    def get_power(self):
-        return self.power
