@@ -22,7 +22,9 @@ system.add_line("L4", 20, "4", "6", system.bundle, system.geometry)
 system.add_line("L5", 10, "6", "5", system.bundle, system.geometry)
 system.add_line("L6", 35, "4", "5", system.bundle, system.geometry)
 
+
 y_bus = Ybus()
+
 y_bus.calculate_Ybus(system)
 
 system.buses.get("2").set_power(0, 0, 0, 0)
