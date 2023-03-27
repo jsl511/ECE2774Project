@@ -18,11 +18,11 @@ class Bundle:
             self.D_SL = math.sqrt(self.conductor.GMR * self.spacing)
             self.D_SC = math.sqrt(self.conductor.radius * self.spacing)
         elif self.number_conductors == 3:
-            self.D_SL = (self.conductor.GMR * (self.spacing ** 2)) ** (1 / 3)
-            self.D_SC = (self.conductor.radius * (self.spacing ** 2)) ** (1 / 3)
+            self.D_SL = (self.conductor.GMR * (self.spacing ** 2)) ** (1/3)
+            self.D_SC = (self.conductor.radius * (self.spacing ** 2)) ** (1/3)
         elif self.number_conductors == 4:
-            self.D_SL = 1.0941 * (self.conductor.GMR * (self.spacing ** 3)) ** (1 / 4)
-            self.D_SC = 1.0941 * (self.conductor.radius * (self.spacing ** 3)) ** (1 / 4)
+            self.D_SL = 1.0941 * (self.conductor.GMR * (self.spacing ** 3)) ** (1/4)
+            self.D_SC = 1.0941 * (self.conductor.radius * (self.spacing ** 3)) ** (1/4)
         else:
             self.D_SL = None  # stranded GMR for inductance
             self.D_SC = None  # stranded GMR for capacitance
