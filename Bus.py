@@ -15,6 +15,6 @@ class Bus:
         self.angle = angle
         self.voltage = voltage
 
-    def set_power(self, power, reactive):
-        self.power = power
-        self.reactive = reactive
+    def set_power(self, P_G, Q_G, P_L, Q_L):
+        self.power = P_G - P_L
+        self.reactive = Q_G - Q_L
