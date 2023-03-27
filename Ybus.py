@@ -1,4 +1,5 @@
 import numpy as np
+np.set_printoptions(threshold=np.inf)
 
 
 class Ybus:
@@ -28,7 +29,4 @@ class Ybus:
             self.y_bus[bus2, bus2] += [1/value.impedance + value.admittance/2]
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
-        print(np.around(self.y_bus, decimals=2))
-
-# check connection from bus A to B
-    # if connected, through transmission line or transformer?
+        # print(np.around(self.y_bus, decimals=2))
