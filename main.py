@@ -1,5 +1,7 @@
 from System import System
 from Ybus import Ybus
+from PowerFlow import PowerFlow
+
 
 # create the 6-node looped transmission system
 system = System()
@@ -15,10 +17,21 @@ system.add_transformer("T2", 200, 20, 230, 0.105, 12, "6", "7")
 
 system.add_line("L1", 10, "2", "4", system.bundle, system.geometry)
 system.add_line("L2", 25, "2", "3", system.bundle, system.geometry)
-system.add_line("L3", 20, "3", "5", system.bundle, system.geometry)
+system.add_line("L3", 20, "3", "6", system.bundle, system.geometry)
 system.add_line("L4", 20, "4", "6", system.bundle, system.geometry)
 system.add_line("L5", 10, "6", "5", system.bundle, system.geometry)
 system.add_line("L6", 35, "4", "5", system.bundle, system.geometry)
 
 y_bus = Ybus()
 y_bus.calculate_Ybus(system)
+
+system.buses.get("2").set_power(0, 0, 0, 0)
+system.buses.get("3").set_power(0, 0, 110, 50)
+system.buses.get("4").set_power(0, 0, 100, 70)
+system.buses.get("5").set_power(0, 0, 100, 65)
+system.buses.get("6").set_power(0, 0, 0, 0)
+system.buses.get("7").set_power(200, 0, 0, 0)
+
+power_flow = PowerFlow(system, y_bus.y_bus, 1)
+power_flow.flat_start()
+power_flow.solve_newton_raphson()
