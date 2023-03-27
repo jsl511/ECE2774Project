@@ -1,6 +1,5 @@
 import numpy as np
 import math
-np.set_printoptions(threshold=np.inf)
 
 
 class PowerFlow:
@@ -22,6 +21,12 @@ class PowerFlow:
             else:
                 self.y[k] = self.system.buses.get(str(k + 1)).power
                 self.y[k + self.N] = self.system.buses.get(str(k + 1)).reactive
+
+        # create empty jacobian quadrants
+        self.jacobian1 = None
+        self.jacobian2 = None
+        self.jacobian3 = None
+        self.jacobian4 = None
 
     def flat_start(self):
         for k in range(self.N):
