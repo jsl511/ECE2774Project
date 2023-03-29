@@ -11,6 +11,9 @@ class Bundle:
 
         self.resistance = self.conductor.resistance/self.number_conductors   # adjust bundle resistance
 
+        self.D_SL = None  # stranded GMR for inductance
+        self.D_SC = None  # stranded GMR for capacitance
+
         if self.number_conductors == 1:
             self.D_SL = self.conductor.GMR
             self.D_SC = self.conductor.radius
@@ -24,5 +27,5 @@ class Bundle:
             self.D_SL = 1.0941 * (self.conductor.GMR * (self.spacing ** 3)) ** (1/4)
             self.D_SC = 1.0941 * (self.conductor.radius * (self.spacing ** 3)) ** (1/4)
         else:
-            self.D_SL = None  # stranded GMR for inductance
-            self.D_SC = None  # stranded GMR for capacitance
+            print("Unexpected number of conductors: greater than 4.")
+            exit(1)
