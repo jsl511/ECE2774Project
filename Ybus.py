@@ -1,16 +1,14 @@
 import numpy as np
-np.set_printoptions(threshold=np.inf)
 
 
 class Ybus:
-    def __init__(self):
-        self.y_bus = None
+    def __init__(self, system):
+        self.system = system
 
-    def calculate_Ybus(self, system):
-        self.y_bus = np.zeros((len(system.buses), len(system.buses)), dtype=complex)
+        self.y_bus = np.zeros((len(self.system.buses), len(self.system.buses)), dtype=complex)
 
         # transformer admittance
-        for value in system.transformers.values():
+        for value in self.system.transformers.values():
             bus1 = int(value.bus1) - 1
             bus2 = int(value.bus2) - 1
 
@@ -20,7 +18,7 @@ class Ybus:
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
         # transmission line admittance
-        for value in system.lines.values():
+        for value in self.system.lines.values():
             bus1 = int(value.bus1) - 1
             bus2 = int(value.bus2) - 1
 
@@ -29,4 +27,4 @@ class Ybus:
             self.y_bus[bus2, bus2] += [1/value.impedance + value.admittance/2]
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
-        # print(np.around(self.y_bus, decimals=2))
+        print(np.around(self.y_bus, decimals=2))
