@@ -5,6 +5,7 @@ from Bus import Bus
 from TransmissionLine import TransmissionLine
 from Transformer import Transformer
 import numpy as np
+from numpy.linalg import inv
 import math
 np.set_printoptions(threshold=np.inf)
 class System:
@@ -121,7 +122,7 @@ class System:
         #jacobian2
         self.jacobian2 = np.delete(self.jacobian2, slackBus, axis=0)
         self.jacobian2 = np.delete(self.jacobian2, slackBus, axis=1)
-
+        self.jacobian2 = np.delete(self.jacobian2, pvBus, axis=1)
         #jacobian3
         self.jacobian3 = np.delete(self.jacobian3, slackBus, axis=0)
         self.jacobian3 = np.delete(self.jacobian3, slackBus, axis=1)
@@ -130,13 +131,16 @@ class System:
         self.jacobian4 = np.delete(self.jacobian4, slackBus, axis=0)
         self.jacobian4 = np.delete(self.jacobian4, slackBus, axis=1)
         self.jacobian4 = np.delete(self.jacobian4, pvBus, axis=0)
+        self.jacobian4 = np.delete(self.jacobian4, pvBus, axis=1)
         #concatenating arrays
 
         jacobian13 = np.concatenate((self.jacobian1, self.jacobian3), axis=0)
         jacobian24 = np.concatenate((self.jacobian2, self.jacobian4), axis=0)
         jacobian= np.concatenate((jacobian13, jacobian24), axis=1)
 
-        print(jacobian)
+        jacobianinvert=inv(jacobian)
+        print(np.around(jacobian,decimals=2))
+        print(np.around(jacobianinvert,decimals=2))
         #print(np.around(self.jacobian1, decimals=2))
         #print(np.around(self.jacobian2, decimals=2))
         #print(np.around(self.jacobian3, decimals=2))
