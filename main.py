@@ -15,7 +15,7 @@ system.add_transformer("T2", 200, 20, 230, 0.105, 12, "6", "7")
 
 system.add_line("L1", 10, "2", "4", system.bundle, system.geometry)
 system.add_line("L2", 25, "2", "3", system.bundle, system.geometry)
-system.add_line("L3", 20, "3", "6", system.bundle, system.geometry)
+system.add_line("L3", 20, "3", "5", system.bundle, system.geometry)
 system.add_line("L4", 20, "4", "6", system.bundle, system.geometry)
 system.add_line("L5", 10, "6", "5", system.bundle, system.geometry)
 system.add_line("L6", 35, "4", "5", system.bundle, system.geometry)
