@@ -27,4 +27,7 @@ class Ybus:
             self.y_bus[bus2, bus2] += [1/value.impedance + value.admittance/2]
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
-        print(np.around(self.y_bus, decimals=2))
+        # np.set_printoptions(linewidth=200)
+        # print("y_bus is: \n" + str(np.around(self.y_bus, decimals=2)))
+        # print(np.around(np.absolute(self.y_bus), decimals=2))
+        # print(np.around(np.angle(self.y_bus), decimals=2))
