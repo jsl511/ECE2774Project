@@ -1,3 +1,4 @@
+import numpy
 import numpy as np
 from math import cos, sin
 
@@ -13,6 +14,8 @@ class PowerFlow:
         self.N = len(self.system.buses)     # number of buses (includes the slack bus)
         self.slack_bus = slack_bus
         self.removed_buses = 0              # tracks buses (slack and pv) removed from x, y, and J
+
+        # NB: arrays are indexed as (rows,cols): therefore axis=0 is the row
 
         # voltage and power vectors for power flow
         self.x = np.empty(2 * self.N)
@@ -48,12 +51,12 @@ class PowerFlow:
             for n in range(self.N):
                 P += self.Y_bus[k,n] * self.x[n + self.N] * cos(self.x[k] - self.x[n] - self.theta[k,n])
                 Q += self.Y_bus[k,n] * self.x[n + self.N] * sin(self.x[k] - self.x[n] - self.theta[k,n])
-
+            # dont update P&Q (original y-vector)
             self.y[k] -= self.x[k + self.N] * P
             self.y[k + self.N] -= self.x[k + self.N] * Q
 
         # step 2: solve the jacobian matrix
-        self.jacobian = self.solve_jacobian()
+        self.solve_jacobian()
 
     def solve_jacobian(self):
         for k in range(self.N):
@@ -77,52 +80,51 @@ class PowerFlow:
             self.jacobian3[k,k] = self.x[k + self.N] * j3
             self.jacobian4[k,k] = -1 * self.x[k + self.N] * self.Y_bus[k,k] * sin(self.theta[k,k]) + j4
 
-        # remove the slack bus from vectors and jacobian arrays
-        self.x = self.remove_slack_bus(self.x)
-        self.y = self.remove_slack_bus(self.y)
-        self.jacobian1 = self.remove_slack_bus(self.jacobian1)
-        self.jacobian2 = self.remove_slack_bus(self.jacobian2)
-        self.jacobian3 = self.remove_slack_bus(self.jacobian3)
-        self.jacobian4 = self.remove_slack_bus(self.jacobian4)
-        self.removed_buses += 1
-
-        # remove the pv bus from jacobian quadrants
-        self.jacobian2 = self.remove_pv_bus(7, 2, self.jacobian2)
-        self.jacobian3 = self.remove_pv_bus(7, 3, self.jacobian3)
-        self.jacobian4 = self.remove_pv_bus(7, 4, self.jacobian4)
-        self.removed_buses += 1
-
         # concatenate the quadrants to form the full jacobian matrix
         jacobian13 = np.concatenate((self.jacobian1, self.jacobian3), axis=0)
         jacobian24 = np.concatenate((self.jacobian2, self.jacobian4), axis=0)
-        jacobian = np.concatenate((jacobian13, jacobian24), axis=1)
+        self.jacobian = np.concatenate((jacobian13, jacobian24), axis=1)
 
-        return jacobian
+        # remove the slack bus from vectors and the jacobian
+        self.x = self.remove_slack_bus(self.x)
+        self.y = self.remove_slack_bus(self.y)
+        self.jacobian = self.remove_slack_bus(self.jacobian)
+        self.removed_buses += 1
+
+        # remove the pv bus from vectors and the jacobian
+        x_temp = self.remove_pv_bus(self.x, 7)
+        y_temp = self.remove_pv_bus(self.y, 7)
+        self.jacobian = self.remove_pv_bus(self.jacobian, 7)
+        self.removed_buses += 1
+
+        # step 3:
+        jacobianinv = np.linalg.inv(self.jacobian)
+        deltaX = np.dot(y_temp, jacobianinv)
+        # bring slack and pv back, rescale vectors by adding zeros where we know they'll be
+        # step 4:
+        self.x = x_temp + deltaX    # self.x = self.x + deltaX
+        print(self.x)
 
     def remove_slack_bus(self, array):
         slack_index = self.slack_bus - 1 - self.removed_buses
 
+        array = np.delete(array, slack_index + self.N, axis=0)
         array = np.delete(array, slack_index, axis=0)
 
         if array.ndim == 2:
+            array = np.delete(array, slack_index + self.N, axis=1)
             array = np.delete(array, slack_index, axis=1)
-        else:   # removing from one of the vectors, they have two slack elements
-            array = np.delete(array, slack_index + self.N - 1, axis=0)
 
         return array
 
-    def remove_pv_bus(self, pv_bus, quadrant, array):
+    def remove_pv_bus(self, array, pv_bus):
         pv_index = pv_bus - 1 - self.removed_buses
 
-        if quadrant == 2:
-            array = np.delete(array, pv_index, axis=1)
-        elif quadrant == 3:
-            array = np.delete(array, pv_index, axis=0)
-        elif quadrant == 4:
-            array = np.delete(array, pv_index, axis=0)
+        array = np.delete(array, pv_index + self.N - self.removed_buses, axis=0)
+        array = np.delete(array, pv_index, axis=0)
+
+        if array.ndim == 2:
+            array = np.delete(array, pv_index + self.N - self.removed_buses, axis=1)
             array = np.delete(array, pv_index, axis=1)
 
         return array
-
-
-
