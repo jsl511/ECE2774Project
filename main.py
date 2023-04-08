@@ -4,7 +4,7 @@ from PowerFlow import PowerFlow
 
 
 # create the 6-node looped transmission system
-system = System()
+system = System(100)
 
 system.set_conductor("partridge", 0.642, 0.0217, 460, 0.350)
 system.set_bundle("bundle", 1.5, 2)
@@ -22,6 +22,7 @@ system.add_line("L6", 35, "4", "5", system.bundle, system.geometry)
 
 y_bus = Ybus(system)
 
+system.buses.get("1").set_voltage(0, 1.0)
 system.buses.get("2").set_power(0, 0, 0, 0)
 system.buses.get("3").set_power(0, 0, 110, 50)
 system.buses.get("4").set_power(0, 0, 100, 70)
