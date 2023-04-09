@@ -52,10 +52,10 @@ class PowerFlow:
             delta_y[k-1 + N] = self.y[k-1 + N] - self.x[k + self.N] * Q
 
         # step 2: calculate the Jacobian matrix
-        jacobian = self.solve_jacobian()
-
+        self.jacobian = self.solve_jacobian()
+        print(self.jacobian)
         # step 3: solve for delta_x
-        jacobian_inv = np.linalg.inv(jacobian)
+        jacobian_inv = np.linalg.inv(self.jacobian)
         delta_y = np.delete(delta_y, self.pv_bus - 1 + N)   # delete pv bus Q so sizes match for solving
         delta_x = np.dot(jacobian_inv,delta_y)
 
