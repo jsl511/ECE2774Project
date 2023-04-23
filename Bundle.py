@@ -1,4 +1,4 @@
-import math
+from math import sqrt
 
 
 class Bundle:
@@ -15,8 +15,8 @@ class Bundle:
             self.D_SL = self.conductor.GMR
             self.D_SC = self.conductor.radius
         elif self.number_conductors == 2:
-            self.D_SL = math.sqrt(self.conductor.GMR * self.spacing)
-            self.D_SC = math.sqrt(self.conductor.radius * self.spacing)
+            self.D_SL = sqrt(self.conductor.GMR * self.spacing)
+            self.D_SC = sqrt(self.conductor.radius * self.spacing)
         elif self.number_conductors == 3:
             self.D_SL = (self.conductor.GMR * (self.spacing ** 2)) ** (1/3)
             self.D_SC = (self.conductor.radius * (self.spacing ** 2)) ** (1/3)

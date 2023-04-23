@@ -6,4 +6,4 @@ class Conductor:
         self.ampacity = ampacity        # (A)
         self.resistance = resistance    # at 25 C (Ohm/mile)
 
-        self.radius = self.diameter / 2
+        self.radius = self.diameter/24  # convert in to ft

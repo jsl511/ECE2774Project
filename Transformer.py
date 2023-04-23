@@ -1,4 +1,4 @@
-import math
+from math import atan, e
 
 
 class Transformer:
@@ -12,4 +12,5 @@ class Transformer:
         self.bus1 = bus1            # high-side bus connection
         self.bus2 = bus2            # low-side bus connection
 
-        self.transformer_admittance = 1/(self.impedance*math.e**(1j*math.atan(self.x_r)))
+        self.transformer_admittance = 1/(self.impedance*e**(1j*atan(self.x_r)))   # TODO: base conversion?
+        print("Transformer " + self.name + " admittance is " + str(self.transformer_admittance))
