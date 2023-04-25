@@ -12,9 +12,9 @@ class Ybus:
             bus1 = int(value.bus1) - 1
             bus2 = int(value.bus2) - 1
 
-            self.y_bus[bus1, bus2] -= [value.transformer_admittance]
-            self.y_bus[bus1, bus1] += [value.transformer_admittance]
-            self.y_bus[bus2, bus2] += [value.transformer_admittance]
+            self.y_bus[bus1, bus2] -= [value.admittance]
+            self.y_bus[bus1, bus1] += [value.admittance]
+            self.y_bus[bus2, bus2] += [value.admittance]
             self.y_bus[bus2, bus1] = self.y_bus[bus1, bus2]
 
         # transmission line admittance
@@ -29,5 +29,6 @@ class Ybus:
 
         # np.set_printoptions(linewidth=200)
         # print("y_bus is: \n" + str(np.around(self.y_bus, decimals=2)))
+        # np.savetxt("ybus.csv", self.y_bus, delimiter=",")
         # print(np.around(np.absolute(self.y_bus), decimals=2))
         # print(np.around(np.angle(self.y_bus), decimals=2))
