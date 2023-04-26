@@ -1,5 +1,7 @@
+import math
+
 import numpy as np
-from math import sin, cos
+from math import sin, cos, pi
 np.set_printoptions(linewidth=200)
 
 # TODO: slack bus other than 1
@@ -10,9 +12,8 @@ class PowerFlow:
         # import relevant system and Ybus data
         self.buses = system.buses
         self.N = len(self.buses)
+        self.y_bus = y_bus
         self.Y_bus, self.theta = np.absolute(y_bus), np.angle(y_bus)
-        # print("Y_bus is: \n" + str(np.around(self.Y_bus, decimals=2)))
-        # print("theta is: \n" + str(np.around(self.theta, decimals=2)))
 
         # initialize power flow vectors and matrices
         self.x = None
@@ -20,35 +21,56 @@ class PowerFlow:
         self.y = self.__initialize_y()/system.S_base
         self.J = np.zeros((len(self.y), len(self.y)))
 
-    def solve_newton_raphson(self):
-        # print("Power vector is: " + str(self.y))
-        print("Voltage vector is: " + str(self.delta))
-        delta_y = self.__calculate_power_mismatch()     # step 1
-        print("Power mismatches are: " + str(np.around(delta_y * 100, decimals=2)))
-        # self.J = self.__compute_jacobian()              # step 2
+    def solve_newton_raphson(self, tolerance, max_its):
+        converged = False
+        iterations = 0
 
-        # J_inv = np.linalg.inv(self.J)
-        # delta_y = np.delete(delta_y, 11)    # delete pv bus Q so sizes match for solving
-        # delta_x = np.dot(J_inv, delta_y)
+        while not converged:
+            delta_y = self.__calculate_power_mismatch()     # step 1
 
-        # return slack and pv bus values omitted during solving
-        # delta_x = np.insert(delta_x, [0, self.N - 1], 0)
-        # delta_x = np.append(delta_x, 0)
-        # delta_y = np.append(delta_y, 0)
+            # check for convergence
+            if np.all(delta_y < tolerance):
+                converged = True
+                self.__print_solutions(iterations)
 
-        # self.x += delta_x
-        # print(self.x)
+            # print(delta_y)
+            self.J = self.__compute_jacobian()              # step 2
 
-        # self.delta = self.x[:self.N]
-        # self.V = self.x[self.N:]
-        # delta_y = self.__calculate_power_mismatch()
-        # print(delta_y)
+            J_inv = np.linalg.inv(self.J)
+            delta_y = np.delete(delta_y, 11)    # delete pv bus Q so sizes match for solving
+            delta_x = np.dot(J_inv, delta_y)    # step 3
+
+            # return slack and pv bus values omitted during solving
+            delta_x = np.insert(delta_x, [0, self.N - 1], 0)
+            delta_x = np.append(delta_x, 0)
+            delta_y = np.append(delta_y, 0)
+
+            self.x += delta_x                   # step 4
+            # print(self.x)
+            self.delta = self.x[:self.N]
+            self.V = self.x[self.N:]
+
+            iterations += 1
+
+            # check for max iterations
+            if iterations > max_its:
+                print("Solution diverged")
+                exit(1)
 
     def flat_start(self):
         for k in range(self.N):
             self.delta[k] = 0
             self.V[k] = 1.0
             self.buses.get(str(k+1)).set_voltage(self.delta[k], self.V[k])
+
+        self.x = np.concatenate((self.delta, self.V), axis=0)
+
+    def test_voltage(self):
+        self.delta = [0.00, -5.84, -6.97, -6.11, -6.23, -5.21, 7.80]
+        self.V = [1, 0.88877, 0.86935, 0.87897, 0.87372, 0.88557, 1]
+
+        for k in range(len(self.delta)):
+            self.delta[k] = self.delta[k] * (pi/180)
 
         self.x = np.concatenate((self.delta, self.V), axis=0)
 
@@ -65,15 +87,23 @@ class PowerFlow:
     def __calculate_power_mismatch(self):
         P_x, Q_x = np.zeros(self.N - 1), np.zeros(self.N - 1)
 
-        for k in range(self.N):
+        for k in range(1,self.N):
             for n in range(self.N):
+                # print("For k = " + str(k) + " and n = " + str(n) + ": ")
+                # print("V[k] = " + str(self.V[k]))
+                # print("Y_bus[k,n] = " + str(self.Y_bus[k,n]))
+                # print("V[n] = " + str(self.V[n]))
+                # print("delta[k] = " + str(self.delta[k]))
+                # print("delta[n] = " + str(self.delta[n]))
+                # print("theta[k,n] " + str(self.theta[k,n]))
                 P_x[k-1] += self.V[k] * self.Y_bus[k,n] * self.V[n] * cos(self.delta[k] - self.delta[n] - self.theta[k,n])
-                print("k = " + str(k) + " n = " + str(n) + ": Q(x) = " + str(self.V[k] * self.Y_bus[k,n] * self.V[n] * sin(self.delta[k] - self.delta[n] - self.theta[k,n])))
                 Q_x[k-1] += self.V[k] * self.Y_bus[k,n] * self.V[n] * sin(self.delta[k] - self.delta[n] - self.theta[k,n])
-                # print("k = " + str(k) + " n = " + str(n) + ": Q(x) = " + str(Q_x[k-1]))
-        f_x = np.concatenate((P_x,Q_x), axis=0)
+                # print("Q[k-1] = " + str(Q_x[k-1]))
+                # print()
 
-        return self.y - f_x   # TODO: why does addition yield the correct result
+        f_x = np.concatenate((P_x,Q_x), axis=0)
+        # print(f_x)
+        return self.y - f_x
 
     def __compute_jacobian(self):
         # Jacobian quadrants
@@ -120,3 +150,6 @@ class PowerFlow:
         array = np.delete(array, 0, axis=1)
 
         return array
+
+    def __print_solutions(self, iterations):
+        print("Solution converged in " + str(iterations) + " iterations. \n")
