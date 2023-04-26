@@ -6,4 +6,8 @@ class Conductor:
         self.ampacity = ampacity        # (A)
         self.resistance = resistance    # at 25 C (Ohm/mile)
 
-        self.radius = self.diameter/24  # convert in to ft
+        self.radius = self.diameter/2
+        self.radius = self.__inches_to_feet(self.radius)
+
+    def __inches_to_feet(self, inches):
+        return inches/12
