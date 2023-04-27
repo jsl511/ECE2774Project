@@ -35,7 +35,7 @@ Updated the "Solve_newton_raphson". Updated the function so it runs until the sy
 
 ## Milestone 5: Sequence Networks
 
-### XXXX.py
+### Sequence.py
 This class solves for the positive, negative and zero sequence networks.
 
 
