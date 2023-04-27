@@ -1,0 +1,8 @@
+
+Model_over_View - Represents the system tested.
+
+Milestone 1- Checked with Y_Bus
+
+Milestone 2- Checked with initial_Mismatches, Initial_Bus_Voltages, and Jacobian_Quadrants_1and3, Jacobian_Quadrants_2and4.
+
+Milestone 3- Checked with Final_Bus_Voltages and Fianl_Mismatches
