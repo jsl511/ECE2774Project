@@ -4,6 +4,7 @@ from Geometry import Geometry
 from Bus import Bus
 from TransmissionLine import TransmissionLine
 from Transformer import Transformer
+from Generator import Generator
 
 
 class System:
@@ -16,6 +17,7 @@ class System:
 
         # empty dictionaries to hold elements with string keys and Object values
         self.buses = {}
+        self.generators = {}
         self.lines = {}
         self.transformers = {}
 
@@ -28,6 +30,12 @@ class System:
         if name not in self.buses.keys():
             self.buses.update({name: Bus(name)})
 
+    def add_generator(self, name, bus, power, positive_impedance, negative_impedance, zero_impedance):
+        if name not in self.generators.keys():
+            self.generators.update({name: Generator(name, bus, power, positive_impedance, negative_impedance, zero_impedance)})
+            self.__add_bus(bus)
+            # TODO: set bus power based on generator power
+            
     def add_line(self, name, length, bus1, bus2, bundle, geometry):
         if name not in self.lines.keys():
             self.lines.update({name: TransmissionLine(name, length, bus1, bus2, bundle, geometry)})
