@@ -12,18 +12,17 @@ class PowerFlow:
         # import relevant system and Ybus data
         self.buses = system.buses
         self.N = len(self.buses)
-        self.y_bus = y_bus
         self.Y_bus, self.theta = np.absolute(y_bus), np.angle(y_bus)
 
         # initialize power flow vectors and matrices
         self.x = None
         self.delta, self.V = np.zeros(self.N), np.zeros(self.N)     # voltage angles and magnitudes
         self.y = self.__initialize_y()/system.S_base
-        self.J = np.zeros((len(self.y), len(self.y)))
+        self.J = None
 
     def solve_newton_raphson(self, tolerance, max_its):
         converged = False
-        iterations = 0
+        iterations = 0  # number of iterations completed
 
         while not converged:
             delta_y = self.__calculate_power_mismatch()     # step 1
@@ -32,30 +31,30 @@ class PowerFlow:
             if np.all(delta_y < tolerance):
                 converged = True
                 self.__print_solutions(iterations)
+            else:
+                self.J = self.__compute_jacobian()          # step 2
 
-            # print(delta_y)
-            self.J = self.__compute_jacobian()              # step 2
+                J_inv = np.linalg.inv(self.J)
+                delta_y = np.delete(delta_y, 11)  # delete pv bus Q so sizes match for solving
+                delta_x = np.dot(J_inv, delta_y)            # step 3
 
-            J_inv = np.linalg.inv(self.J)
-            delta_y = np.delete(delta_y, 11)    # delete pv bus Q so sizes match for solving
-            delta_x = np.dot(J_inv, delta_y)    # step 3
+                # return slack and pv bus values omitted during solving
+                delta_x = np.insert(delta_x, [0, self.N - 1], 0)
+                delta_x = np.append(delta_x, 0)
+                delta_y = np.append(delta_y, 0)
 
-            # return slack and pv bus values omitted during solving
-            delta_x = np.insert(delta_x, [0, self.N - 1], 0)
-            delta_x = np.append(delta_x, 0)
-            delta_y = np.append(delta_y, 0)
+                self.x += delta_x                           # step 4
 
-            self.x += delta_x                   # step 4
-            # print(self.x)
-            self.delta = self.x[:self.N]
-            self.V = self.x[self.N:]
+                # assign new voltage data for next iteration
+                self.delta = self.x[:self.N]
+                self.V = self.x[self.N:]
 
-            iterations += 1
+                iterations += 1     # completed one iteration
 
-            # check for max iterations
-            if iterations > max_its:
-                print("Solution diverged")
-                exit(1)
+                # check for max iterations
+                if iterations > max_its:
+                    print("Solution diverged")
+                    exit(1)
 
     def flat_start(self):
         for k in range(self.N):
@@ -89,20 +88,11 @@ class PowerFlow:
 
         for k in range(1,self.N):
             for n in range(self.N):
-                # print("For k = " + str(k) + " and n = " + str(n) + ": ")
-                # print("V[k] = " + str(self.V[k]))
-                # print("Y_bus[k,n] = " + str(self.Y_bus[k,n]))
-                # print("V[n] = " + str(self.V[n]))
-                # print("delta[k] = " + str(self.delta[k]))
-                # print("delta[n] = " + str(self.delta[n]))
-                # print("theta[k,n] " + str(self.theta[k,n]))
                 P_x[k-1] += self.V[k] * self.Y_bus[k,n] * self.V[n] * cos(self.delta[k] - self.delta[n] - self.theta[k,n])
                 Q_x[k-1] += self.V[k] * self.Y_bus[k,n] * self.V[n] * sin(self.delta[k] - self.delta[n] - self.theta[k,n])
-                # print("Q[k-1] = " + str(Q_x[k-1]))
-                # print()
 
         f_x = np.concatenate((P_x,Q_x), axis=0)
-        # print(f_x)
+
         return self.y - f_x
 
     def __compute_jacobian(self):
@@ -145,7 +135,8 @@ class PowerFlow:
 
         return jacobian
 
-    def __remove_slack_bus(self, array):
+    @staticmethod
+    def __remove_slack_bus(array):
         array = np.delete(array, 0, axis=0)
         array = np.delete(array, 0, axis=1)
 
