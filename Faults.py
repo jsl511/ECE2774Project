@@ -2,43 +2,48 @@ import numpy as np
 
 class Faults:
 
-    def __init__(self,system):
+    def __init__(self,system,powerflow,sequence):
 
         self.system=system
+        self.powerflow=powerflow
+        self.currentArray=np.zeros(1, 3)
+        self.v_f=self.powerflow.V*np.exp(1j*self.powerflow.delta)
+        self.sequence=sequence
+    def Symmetrical_fault(self, bus):
+
+        bus=int(bus)-1
+
+        self.currentArray[1]=self.v_f[bus]/self.sequence.z_positive[bus,bus]
+        self.currentArray[2]=0
+        self.currentArray[0]=0
+
+    def Single_line_to_ground(self, bus,zf):
+
+        bus = int(bus) - 1
+
+        self.currentArray[1] = self.v_f[bus] / (self.sequence.z_positive[bus, bus]+self.sequence.z_negative[bus, bus]+self.sequence.z_zero[bus, bus]+3*zf)
+        self.currentArray[2] = self.currentArray[1]
+        self.currentArray[0] = self.currentArray[1]
+
+    def Line_to_line_fault(self, bus, zf ):
+
+        bus = int(bus) - 1
+
+        self.currentArray[1] = self.v_f[bus] / (self.sequence.z_positive[bus, bus] + self.sequence.z_negative[bus, bus] + self.sequence.z_zero[bus, bus] + zf)
+        self.currentArray[2] = -1*self.currentArray[1]
+        self.currentArray[0] = 0
+
+    def double_line_to_ground(self, bus, zf):
 
 
-    def Symmetrical_fault(self, bus1):
-        #convertBus1toNumber
+        bus = int(bus) - 1
+        self.currentArray[1] = self.v_f[bus] / (self.sequence.z_positive[bus, bus] + (self.sequence.z_negative[bus,bus]*(self.sequence.z_zero[bus,bus]+3*zf)/(self.sequence.z_negative+self.sequence.z_zero+3*zf)))
+        self.currentArray[2] = -1 * self.currentArray[1] * ((self.sequence.z_zero+3*zf)/(self.sequence.z_zero+3*zf+self.sequence.z_negative))
+        self.currentArray[0] = -1 * self.currentArray[1] * ((self.sequence.z_negative)/(self.sequence.z_zero+3*zf+self.sequence.z_positive))
 
-        #I(+)atBusN=VF(PreFault_Voltage)/(Z(+)atBusNN
-        #I(-)atBusN=0
-        #I(0)atBusN=0
 
-    def Single_line_to_ground(self, bus1,line1):
-
-        # convertBus1toNumber
-        # convertLine1toNumber
-
-        # I(+)atBusN=VF(PreFault_Voltage)/(Z(+)atBusNN+Z(-)atBusNN+Z(0)atBusNN+3ZF)
-        # I(-)atBusN= I(+)
-        # I(0)atBusN= I(+)
-    def Line_to_line_fault(self, bus1,line1,line2 ):
-
-        # convertBus1toNumber
-        # convertLine1toNumber
-        # convertLne2toNumber
-
-        # I(+)atBusN=VF(PreFault_Voltage)/(Z(+)atBusNN+Z(-)atBusNN+Z(0)atBusNN+ZF)
-        # I(-)atBusN= -1*I(+)
-        # I(0)atBusN= 0
-    def double_line_to_ground(self, bus1, line1,line2):
-
-        # convertBus1toNumber
-        # convertLine1toNumber
-        # convertLne2toNumber
-
-        #Yeah no you are gonna get confused if i pseudo code this
     def __voltage_and_current_calculations(self):
-        #im 1/2 lost here.
+        
+        pass
 
 
