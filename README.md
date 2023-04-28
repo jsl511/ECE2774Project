@@ -38,6 +38,13 @@ Updated the "Solve_newton_raphson". Updated the function so it runs until the sy
 ### Sequence.py
 This class solves for the positive, negative and zero sequence networks.
 
+## Milestone 6: Fault Analysis
+
+### Fault.py
+This class solves for symetrical faults, single line to ground faults, line to line faults, and double line to ground faults. 
+
+##**currently is not implemented in the main function**
+
 
 
 
